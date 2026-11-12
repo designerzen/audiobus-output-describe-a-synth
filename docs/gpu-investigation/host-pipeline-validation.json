@@ -1,0 +1,216 @@
+{
+  "externalRequests": [],
+  "fixture": "local Windows speech synthesis fed as microphone MediaStream",
+  "noGenerationBeforeRelease": true,
+  "notes": {
+    "count": 2,
+    "independentRelease": true,
+    "panicReleasedBoth": true,
+    "rates": [
+      1.3783544301986694,
+      0.8195744752883911
+    ]
+  },
+  "patch": {
+    "description": "Make it sound like a soft glass bell.",
+    "mode": "sample",
+    "model": "atauser001/stable-audio-open-small-onnx@8f9544df5933b9ed4a7e8ed7fa6f77b3dd48ddce",
+    "pcmBytes": 235568,
+    "rootFrequency": 319.2212302518455,
+    "seed": 2284686724
+  },
+  "persistence": {
+    "hasContext": false,
+    "hasPatch": true,
+    "type": "describe-synth"
+  },
+  "releaseAt": 50294.58500003815,
+  "test": "host-factory-hold-streaming-speech-gpu-instrument",
+  "trace": [
+    {
+      "at": 39281.62999999523,
+      "message": "Waiting for microphone permission. Keep holding to record.",
+      "stage": "requesting-microphone",
+      "text": ""
+    },
+    {
+      "at": 39283.299999952316,
+      "message": "Listening and transcribing… release to finish your description.",
+      "stage": "recording",
+      "text": ""
+    },
+    {
+      "at": 42714.889999985695,
+      "message": "Listening… Make it sound like",
+      "stage": "recording",
+      "text": "Make it sound like"
+    },
+    {
+      "at": 42948.84000003338,
+      "message": "Listening… Make it sound like a soft glass-bass",
+      "stage": "recording",
+      "text": "Make it sound like a soft glass-bass"
+    },
+    {
+      "at": 43152.24000000954,
+      "message": "Listening… Make it sound like a soft glass bell.",
+      "stage": "recording",
+      "text": "Make it sound like a soft glass bell."
+    },
+    {
+      "at": 43615,
+      "message": "Listening… Make it sound like a soft glass bell.",
+      "stage": "recording",
+      "text": "Make it sound like a soft glass bell."
+    },
+    {
+      "at": 44602.575000047684,
+      "message": "Listening… Make it sound like a soft glass bell.",
+      "stage": "recording",
+      "text": "Make it sound like a soft glass bell."
+    },
+    {
+      "at": 45577.24000000954,
+      "message": "Listening… Make it sound like a soft glass bell.",
+      "stage": "recording",
+      "text": "Make it sound like a soft glass bell."
+    },
+    {
+      "at": 46610.33500003815,
+      "message": "Listening… Make it sound like a soft glass bell.",
+      "stage": "recording",
+      "text": "Make it sound like a soft glass bell."
+    },
+    {
+      "at": 47618.075000047684,
+      "message": "Listening… Make it sound like a soft glass bell.",
+      "stage": "recording",
+      "text": "Make it sound like a soft glass bell."
+    },
+    {
+      "at": 48611.82000005245,
+      "message": "Listening… Make it sound like a soft glass bell.",
+      "stage": "recording",
+      "text": "Make it sound like a soft glass bell."
+    },
+    {
+      "at": 49639.42999994755,
+      "message": "Listening… Make it sound like a soft glass bell.",
+      "stage": "recording",
+      "text": "Make it sound like a soft glass bell."
+    },
+    {
+      "at": 50296.09500002861,
+      "message": "Preparing your recorded description…",
+      "stage": "transcribing",
+      "text": "Make it sound like a soft glass bell."
+    },
+    {
+      "at": 50490.38499999046,
+      "message": "Preparing your instrument locally…",
+      "progress": 0,
+      "stage": "generating",
+      "text": "Make it sound like a soft glass bell."
+    },
+    {
+      "at": 50664.59000003338,
+      "message": "Preparing: Make it sound like a soft glass bell.",
+      "progress": 0.05,
+      "stage": "interpreting",
+      "text": "Make it sound like a soft glass bell.",
+      "transcript": "Make it sound like a soft glass bell."
+    },
+    {
+      "at": 50761.23000001907,
+      "message": "Loading local text conditioning…",
+      "progress": 0.1,
+      "stage": "generating",
+      "text": "Make it sound like a soft glass bell."
+    },
+    {
+      "at": 54993.96500003338,
+      "message": "Loading the local WebGPU sound model…",
+      "progress": 0.2,
+      "stage": "generating",
+      "text": "Make it sound like a soft glass bell."
+    },
+    {
+      "at": 64985.78999996185,
+      "message": "Generating on this device: 1 of 8…",
+      "progress": 0.25,
+      "stage": "generating",
+      "text": "Make it sound like a soft glass bell."
+    },
+    {
+      "at": 67959.2350000143,
+      "message": "Generating on this device: 2 of 8…",
+      "progress": 0.3125,
+      "stage": "generating",
+      "text": "Make it sound like a soft glass bell."
+    },
+    {
+      "at": 69187.92999994755,
+      "message": "Generating on this device: 3 of 8…",
+      "progress": 0.375,
+      "stage": "generating",
+      "text": "Make it sound like a soft glass bell."
+    },
+    {
+      "at": 70461.70000004768,
+      "message": "Generating on this device: 4 of 8…",
+      "progress": 0.4375,
+      "stage": "generating",
+      "text": "Make it sound like a soft glass bell."
+    },
+    {
+      "at": 71611.22000002861,
+      "message": "Generating on this device: 5 of 8…",
+      "progress": 0.5,
+      "stage": "generating",
+      "text": "Make it sound like a soft glass bell."
+    },
+    {
+      "at": 72932.81500005722,
+      "message": "Generating on this device: 6 of 8…",
+      "progress": 0.5625,
+      "stage": "generating",
+      "text": "Make it sound like a soft glass bell."
+    },
+    {
+      "at": 74242.71500003338,
+      "message": "Generating on this device: 7 of 8…",
+      "progress": 0.625,
+      "stage": "generating",
+      "text": "Make it sound like a soft glass bell."
+    },
+    {
+      "at": 76202.39499998093,
+      "message": "Generating on this device: 8 of 8…",
+      "progress": 0.6875,
+      "stage": "generating",
+      "text": "Make it sound like a soft glass bell."
+    },
+    {
+      "at": 78214.96500003338,
+      "message": "Decoding your instrument locally…",
+      "progress": 0.8,
+      "stage": "generating",
+      "text": "Make it sound like a soft glass bell."
+    },
+    {
+      "at": 86893.42499995232,
+      "message": "Tuning and preparing a playable patch…",
+      "progress": 0.95,
+      "stage": "preparing",
+      "text": "Make it sound like a soft glass bell."
+    },
+    {
+      "at": 87036.1100000143,
+      "message": "Instrument ready. Play notes in HarmonEasy.",
+      "progress": 1,
+      "stage": "ready",
+      "text": "Make it sound like a soft glass bell."
+    }
+  ],
+  "transcriptionWhileHeld": true
+}

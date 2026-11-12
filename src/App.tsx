@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import OutputDescribeSynth, { EVENT_CONFIGURATION_CHANGED } from "./output/output-describe-synth";
 import type { SavedPatch } from "./output/types";
+import ModelSetup from "./ModelSetup";
 
 export default function App() {
   const host = useRef<HTMLDivElement>(null);
@@ -52,6 +53,7 @@ export default function App() {
   }, []);
   return <main className="instrument-demo">
     <header><p className="eyebrow">Output plugin · on-device audio</p><h1>Describe a Synth</h1><p>Hold. Describe. Release. Play.</p></header>
+    {import.meta.env.MODE === "pages" && <ModelSetup />}
     <div className="instrument-card" ref={host} />
     <footer>Hold the microphone button while speaking; transcription starts as you talk. Release ends the section and creates a playable instrument. Audition with A–K, or install the plugin in your host application.</footer>
   </main>;

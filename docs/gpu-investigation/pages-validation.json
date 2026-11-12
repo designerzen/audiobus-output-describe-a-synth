@@ -1,0 +1,27 @@
+{
+  "environment": {
+    "isolated": false,
+    "gpu": true,
+    "quota": 13074430976
+  },
+  "remote": {
+    "ok": true,
+    "type": "cors",
+    "bytes": 921
+  },
+  "generationSeconds": 42.179,
+  "speech": {
+    "type": "transcript",
+    "text": "",
+    "final": true
+  },
+  "details": "Transcript / description: A dog barking, a deep short woof\nGeneration prompt: A dog barking, a deep short dog bark. Isolated single sound event with its natural attack and decay, dry close recording.\nModel: atauser001/stable-audio-open-small-onnx@8f9544df5933b9ed4a7e8ed7fa6f77b3dd48ddce\nSeed: 1185783687\nUnranked; audition to choose.\nOriginal generator audio retained.",
+  "artifactWeightsExcluded": true,
+  "cachedSetupCheckSeconds": 0.332,
+  "folderImport": {
+    "files": 24,
+    "bytes": 2336995732,
+    "completed": true
+  },
+  "scope": "Local Pages artifact under the repository subpath, without COOP/COEP. Not a live GitHub deployment."
+}

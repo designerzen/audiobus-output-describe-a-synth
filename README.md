@@ -32,6 +32,37 @@ Review the [sound conversion's model terms and notices](https://huggingface.co/a
 
 Local matching uses the [Xenova CLAP ONNX conversion](https://huggingface.co/Xenova/clap-htsat-unfused) of [LAION CLAP](https://huggingface.co/laion/clap-htsat-unfused), whose upstream model card specifies Apache-2.0. The setup script pins its revision and verifies both quantized graph hashes. The extra matching assets add about 165 MB; existing sound-model files are reused.
 
+## GitHub Pages test page
+
+The [Pages workflow](.github/workflows/pages.yml) checks types, runs tests, builds the independent plugin, and builds a separate hosted demo. Pull requests run the build checks; pushes to `main` and manual workflow runs on `main` deploy the demo.
+
+In the repository's **Settings → Pages → Build and deployment**, select **GitHub Actions** as the source. Push the workflow and its supporting source/scripts to `main`, or run **Test and deploy GitHub Pages demo** from Actions after enabling Pages. The deployment job publishes the resulting URL. For this repository the expected default URL is:
+
+**https://designerzen.github.io/audiobus-input-describe-a-synth/**
+
+This is the configured URL, not a claim that deployment has already run. Custom domains and account-root sites use the base path reported by `actions/configure-pages`.
+
+The Pages artifact is about 105 MB and excludes all model weights. GitHub Pages has a [1 GB published-site limit](https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits); the 2.3 GB of models are installed on the visitor's device instead. On the hosted page:
+
+1. Choose **Download models to this device** to fetch pinned pretrained files from Hugging Face into this site's browser cache. Downloads stream to cache, resume by skipping completed files, and do not run hosted inference. Browser setup validates expected file sizes; the Node setup CLI also checks the pinned graph hashes.
+2. Alternatively, run `pnpm setup:models` locally and use **Import your existing models folder** to select `public/describe-synth/models`. The folder must contain `sound`, `moonshine`, and `clap`. This avoids downloading those weights again over the internet.
+3. Once **Models ready** appears, hold the microphone button or type a description and generate. The browser may ask for microphone permission. Use a desktop WebGPU browser with at least about 2.5 GB of available browser storage plus inference working memory.
+
+The page keeps recordings and inference on-device. Model caches belong to the site's origin and URL path; a localhost cache does not automatically carry over to the GitHub Pages origin. Clearing browser data or cache eviction requires setup again. The optional native CUDA companion is intended for the localhost app; the hosted page does not supply a native server.
+
+GitHub Pages cannot set the development server's COOP/COEP headers. The worker already falls back to one WASM thread when cross-origin isolation is absent; this preserves local speech recognition and conditioning with potentially slower preparation. No service worker, proxy, or cloud inference is required.
+
+Build the same artifact locally, including a repository subpath, with:
+
+```powershell
+$env:PAGES_BASE_PATH = '/audiobus-input-describe-a-synth/'
+pnpm build:pages
+```
+
+A local browser check imported all 24 model files, generated a patch with WebGPU and ran the speech model with `crossOriginIsolated === false`; see [Pages validation](docs/gpu-investigation/pages-validation.json). This verifies the artifact under the repository path, not a live deployment.
+
+The output is `dist/pages`; `.nojekyll`, the icon, worker/worklet modules, runtime/WASM files, and model setup UI are included. Model folders, the CUDA companion, hosting-provider server shims, and plugin distribution are excluded. The build rejects artifacts exceeding its 900 MB budget. Omitting `PAGES_BASE_PATH` builds for `/`.
+
 ## Package installation and host integration
 
 This repository is independent of HarmonEasy. It has no dependency on a neighbouring checkout, does not edit a host application, and does not register itself during installation. HarmonEasy (or another compatible host) installs the package and owns registration, static asset deployment, and model installation.

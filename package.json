@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build && pnpm build:plugin",
+    "build:pages": "node scripts/stage-runtime.mjs && node scripts/build-pages.mjs",
     "postbuild": "node scripts/copy-hosting-config.mjs",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",

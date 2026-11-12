@@ -1,0 +1,17 @@
+{
+  "runtime": "Transformers.js 4.3.2 Node CPU (browser uses WASM)",
+  "model": "Xenova/clap-htsat-unfused@c28f2883575e590e04d3146ff0713c2448d691ba",
+  "prompt": "A dog barking",
+  "remoteModelLoading": false,
+  "candidates": [
+    {
+      "name": "dog_barking",
+      "similarity": 0.5034557709378393
+    },
+    {
+      "name": "cat_meow",
+      "similarity": 0.060035507938983115
+    }
+  ],
+  "passed": true
+}

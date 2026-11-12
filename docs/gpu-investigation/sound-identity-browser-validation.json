@@ -1,0 +1,28 @@
+{
+  "isolatedHeadlessChrome": true,
+  "inferenceRequestsRestrictedToLoopback": true,
+  "evidence": [
+    {
+      "name": "dog",
+      "prompt": "A dog barking, a deep short woof",
+      "seconds": 84.39,
+      "alternatives": [
+        "Alternative 1 · match 0.503",
+        "Alternative 2 · match 0.484",
+        "Alternative 3 · match 0.431"
+      ],
+      "details": "Transcript / description: A dog barking, a deep short woof\nGeneration prompt: A dog barking, a deep short dog bark. Isolated single sound event with its natural attack and decay, dry close recording.\nModel: atauser001/stable-audio-open-small-onnx@8f9544df5933b9ed4a7e8ed7fa6f77b3dd48ddce\nSeed: 3386606350\nCLAP cosine similarity: 0.503. Relative match, not a probability or guarantee.\nOriginal generator audio retained."
+    },
+    {
+      "name": "dinosaur",
+      "prompt": "A dinosaur making a deep rough chesty roar",
+      "seconds": 68.482,
+      "alternatives": [
+        "Alternative 1 · match 0.655",
+        "Alternative 2 · match 0.655",
+        "Alternative 3 · match 0.628"
+      ],
+      "details": "Transcript / description: A dinosaur making a deep rough chesty roar\nGeneration prompt: A dinosaur creature with a deep, rough, chesty roar making a deep rough chesty roar. Isolated single sound event with its natural attack and decay, dry close recording.\nModel: atauser001/stable-audio-open-small-onnx@8f9544df5933b9ed4a7e8ed7fa6f77b3dd48ddce\nSeed: 472500669\nCLAP cosine similarity: 0.655. Relative match, not a probability or guarantee.\nOriginal generator audio retained."
+    }
+  ]
+}

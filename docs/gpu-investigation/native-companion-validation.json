@@ -1,0 +1,51 @@
+{
+  "device": "NVIDIA GeForce RTX 3050 Ti Laptop GPU",
+  "localOnly": true,
+  "steps": 100,
+  "offload": "model",
+  "seconds": 111.635,
+  "alternatives": [
+    "Alternative 1 · match 0.353",
+    "Alternative 2 · match 0.151",
+    "Alternative 3 · match 0.058"
+  ],
+  "details": "Transcript / description: A dog barking, a deep short woof\nGeneration prompt: A dog barking, a deep short dog bark. Isolated single sound event with its natural attack and decay, dry close recording.\nModel: cvssp/audioldm2@c8e7e189d324425c05c4c2f81214041ef4107983\nSeed: 1440647747\nCLAP cosine similarity: 0.353. Relative match, not a probability or guarantee.\nOriginal generator audio retained.",
+  "patches": [
+    {
+      "model": "cvssp/audioldm2@c8e7e189d324425c05c4c2f81214041ef4107983",
+      "seed": 1440647747,
+      "similarity": 0.3527717824826867,
+      "generation": {
+        "steps": 100,
+        "backend": "local CUDA",
+        "offload": "model"
+      },
+      "rootFrequency": 261.6255653005986,
+      "frames": 62180
+    },
+    {
+      "model": "cvssp/audioldm2@c8e7e189d324425c05c4c2f81214041ef4107983",
+      "seed": 3108563655,
+      "similarity": 0.15132020456499656,
+      "generation": {
+        "steps": 100,
+        "backend": "local CUDA",
+        "offload": "model"
+      },
+      "rootFrequency": 261.6255653005986,
+      "frames": 352800
+    },
+    {
+      "model": "cvssp/audioldm2@c8e7e189d324425c05c4c2f81214041ef4107983",
+      "seed": 3569914799,
+      "similarity": 0.05753806661270712,
+      "generation": {
+        "steps": 100,
+        "backend": "local CUDA",
+        "offload": "model"
+      },
+      "rootFrequency": 261.6255653005986,
+      "frames": 352800
+    }
+  ]
+}

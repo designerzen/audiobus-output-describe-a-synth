@@ -1,0 +1,140 @@
+{
+  "frames": 90112,
+  "logs": [
+    {
+      "stage": "ready"
+    },
+    {
+      "architecture": "gen-12lp",
+      "maxBufferSize": 2147483648,
+      "stage": "adapter",
+      "vendor": "intel"
+    },
+    {
+      "stage": "conditioning-load"
+    },
+    {
+      "inputs": [
+        "input_ids",
+        "attention_mask",
+        "seconds_total"
+      ],
+      "ms": 3947.375,
+      "outputs": [
+        "cross",
+        "global"
+      ],
+      "stage": "conditioning-loaded"
+    },
+    {
+      "ms": 204.08500003814697,
+      "shapes": {
+        "cross": [
+          1,
+          65,
+          768
+        ],
+        "global": [
+          1,
+          768
+        ]
+      },
+      "stage": "conditioned"
+    },
+    {
+      "stage": "dit-load"
+    },
+    {
+      "inputs": [
+        "x",
+        "t",
+        "cross",
+        "global"
+      ],
+      "ms": 8457.430000066757,
+      "outputs": [
+        "v"
+      ],
+      "stage": "dit-loaded"
+    },
+    {
+      "finite": true,
+      "i": 0,
+      "ms": 2660.6999999284744,
+      "stage": "step"
+    },
+    {
+      "finite": true,
+      "i": 1,
+      "ms": 1268.5400000810623,
+      "stage": "step"
+    },
+    {
+      "finite": true,
+      "i": 2,
+      "ms": 1260.0099999904633,
+      "stage": "step"
+    },
+    {
+      "finite": true,
+      "i": 3,
+      "ms": 1261.5849999189377,
+      "stage": "step"
+    },
+    {
+      "finite": true,
+      "i": 4,
+      "ms": 1270.9349999427795,
+      "stage": "step"
+    },
+    {
+      "finite": true,
+      "i": 5,
+      "ms": 1244.3700000047684,
+      "stage": "step"
+    },
+    {
+      "finite": true,
+      "i": 6,
+      "ms": 1556.4950000047684,
+      "stage": "step"
+    },
+    {
+      "finite": true,
+      "i": 7,
+      "ms": 1897.7649999856949,
+      "stage": "step"
+    },
+    {
+      "stage": "decoder-load"
+    },
+    {
+      "ms": 2224.5750000476837,
+      "stage": "decoder-loaded"
+    },
+    {
+      "finite": true,
+      "ms": 3422.2999999523163,
+      "shape": [
+        1,
+        2,
+        90112
+      ],
+      "stage": "decoded"
+    }
+  ],
+  "ok": true,
+  "peak": 0.5875381231307983,
+  "prompt": "A solo bowed cello playing a single sustained note, dry isolated recording, no accompaniment",
+  "rms": 0.10233590067199969,
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) T3CodeBeta/0.1.7 Chrome/152.0.7977.169 Electron/44.10.1 Safari/537.36",
+  "measuredStagesTotalMs": 30676.164999961853,
+  "model": {
+    "repo": "atauser001/stable-audio-open-small-onnx",
+    "revision": "8f9544df5933b9ed4a7e8ed7fa6f77b3dd48ddce",
+    "runtime": "onnxruntime-web@1.24.3",
+    "conditioning": "wasm",
+    "denoiser": "webgpu",
+    "decoder": "webgpu"
+  }
+}

@@ -1,0 +1,9 @@
+# Install a CUDA-enabled PyTorch wheel separately, using pytorch.org's command for your system.
+diffusers==0.38.0
+# The pinned AudioLDM2 snapshot uses GPT2Model's pre-4.50 generation helpers.
+transformers==4.49.0
+accelerate==1.15.0
+safetensors==0.8.0
+sentencepiece==0.2.3
+numpy==2.5.4
+huggingface-hub==0.36.2

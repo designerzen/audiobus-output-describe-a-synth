@@ -1,0 +1,9 @@
+/node_modules/
+/*.onnx
+/*.partial
+/tokenizer.json
+/inputs.json
+/result.wav
+/result.json
+/MODEL-LICENSE
+/MODEL-NOTICE

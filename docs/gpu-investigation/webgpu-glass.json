@@ -1,0 +1,140 @@
+{
+  "frames": 90112,
+  "logs": [
+    {
+      "stage": "ready"
+    },
+    {
+      "architecture": "gen-12lp",
+      "maxBufferSize": 2147483648,
+      "stage": "adapter",
+      "vendor": "intel"
+    },
+    {
+      "stage": "conditioning-load"
+    },
+    {
+      "inputs": [
+        "input_ids",
+        "attention_mask",
+        "seconds_total"
+      ],
+      "ms": 3174.014999985695,
+      "outputs": [
+        "cross",
+        "global"
+      ],
+      "stage": "conditioning-loaded"
+    },
+    {
+      "ms": 171.04499995708466,
+      "shapes": {
+        "cross": [
+          1,
+          65,
+          768
+        ],
+        "global": [
+          1,
+          768
+        ]
+      },
+      "stage": "conditioned"
+    },
+    {
+      "stage": "dit-load"
+    },
+    {
+      "inputs": [
+        "x",
+        "t",
+        "cross",
+        "global"
+      ],
+      "ms": 6664.899999976158,
+      "outputs": [
+        "v"
+      ],
+      "stage": "dit-loaded"
+    },
+    {
+      "finite": true,
+      "i": 0,
+      "ms": 4206.820000052452,
+      "stage": "step"
+    },
+    {
+      "finite": true,
+      "i": 1,
+      "ms": 1253.5499999523163,
+      "stage": "step"
+    },
+    {
+      "finite": true,
+      "i": 2,
+      "ms": 1229.3450000286102,
+      "stage": "step"
+    },
+    {
+      "finite": true,
+      "i": 3,
+      "ms": 1249.0099999904633,
+      "stage": "step"
+    },
+    {
+      "finite": true,
+      "i": 4,
+      "ms": 1215.25,
+      "stage": "step"
+    },
+    {
+      "finite": true,
+      "i": 5,
+      "ms": 1209.7300000190735,
+      "stage": "step"
+    },
+    {
+      "finite": true,
+      "i": 6,
+      "ms": 1246.8500000238419,
+      "stage": "step"
+    },
+    {
+      "finite": true,
+      "i": 7,
+      "ms": 1242.5350000858307,
+      "stage": "step"
+    },
+    {
+      "stage": "decoder-load"
+    },
+    {
+      "ms": 2204.4950000047684,
+      "stage": "decoder-loaded"
+    },
+    {
+      "finite": true,
+      "ms": 3274.7050000429153,
+      "shape": [
+        1,
+        2,
+        90112
+      ],
+      "stage": "decoded"
+    }
+  ],
+  "ok": true,
+  "peak": 1.325747013092041,
+  "prompt": "A single glass bottle shattering on concrete, isolated sound effect",
+  "rms": 0.06698275361272388,
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) T3CodeBeta/0.1.7 Chrome/152.0.7977.169 Electron/44.10.1 Safari/537.36",
+  "measuredStagesTotalMs": 28342.25000011921,
+  "model": {
+    "repo": "atauser001/stable-audio-open-small-onnx",
+    "revision": "8f9544df5933b9ed4a7e8ed7fa6f77b3dd48ddce",
+    "runtime": "onnxruntime-web@1.24.3",
+    "conditioning": "wasm",
+    "denoiser": "webgpu",
+    "decoder": "webgpu"
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "initial": [
+    {
+      "message": "Caching cond.onnx for future requests…",
+      "path": "models/sound/cond.onnx",
+      "source": "network",
+      "type": "progress"
+    },
+    {
+      "name": "cond.onnx",
+      "size": "439547211",
+      "type": "verified"
+    },
+    {
+      "message": "Caching dit.onnx for future requests…",
+      "path": "models/sound/dit.onnx",
+      "source": "network",
+      "type": "progress"
+    },
+    {
+      "name": "dit.onnx",
+      "size": "1364171978",
+      "type": "verified"
+    },
+    {
+      "message": "Caching dec.onnx for future requests…",
+      "path": "models/sound/dec.onnx",
+      "source": "network",
+      "type": "progress"
+    },
+    {
+      "name": "dec.onnx",
+      "size": "312575029",
+      "type": "verified"
+    },
+    {
+      "cache": "describe-synth-models-v1-sound-8f9544df-speech-a6da1241",
+      "fetches": 3,
+      "type": "done"
+    }
+  ],
+  "reuse": [
+    {
+      "message": "Using cached cond.onnx — no download.",
+      "path": "models/sound/cond.onnx",
+      "source": "cache",
+      "type": "progress"
+    },
+    {
+      "name": "cond.onnx",
+      "size": "439547211",
+      "type": "verified"
+    },
+    {
+      "message": "Using cached dit.onnx — no download.",
+      "path": "models/sound/dit.onnx",
+      "source": "cache",
+      "type": "progress"
+    },
+    {
+      "name": "dit.onnx",
+      "size": "1364171978",
+      "type": "verified"
+    },
+    {
+      "message": "Using cached dec.onnx — no download.",
+      "path": "models/sound/dec.onnx",
+      "source": "cache",
+      "type": "progress"
+    },
+    {
+      "name": "dec.onnx",
+      "size": "312575029",
+      "type": "verified"
+    },
+    {
+      "cache": "describe-synth-models-v1-sound-8f9544df-speech-a6da1241",
+      "fetches": 0,
+      "type": "done"
+    }
+  ],
+  "generation": {
+    "completed": true,
+    "description": "A soft wooden flute with a short release",
+    "cachedGraphs": [
+      "cond.onnx",
+      "dit.onnx",
+      "dec.onnx"
+    ],
+    "finalStatus": "Instrument ready. Play notes."
+  }
+}

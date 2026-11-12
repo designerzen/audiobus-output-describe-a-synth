@@ -1,0 +1,45 @@
+<!doctype html><meta charset="utf-8"><title>Local audio GPU probe</title><pre id="status">GPU probe</pre><script type="module">
+import * as ort from './node_modules/onnxruntime-web/dist/ort.webgpu.bundle.min.mjs?fresh=1';
+window.logs=[]; window.result={};
+const log=(stage,data={})=>{window.logs.push({stage,...data});console.log(stage,data)};
+ort.env.wasm.wasmPaths='/node_modules/onnxruntime-web/dist/';
+ort.env.wasm.numThreads=4;
+window.probe=async function(){
+try{
+ const a=await navigator.gpu.requestAdapter({powerPreference:'high-performance'});
+ log('adapter',{vendor:a.info.vendor,architecture:a.info.architecture,maxBufferSize:a.limits.maxBufferSize});
+ const inputs=await (await fetch('./inputs.json')).json();
+ log('conditioning-load');let start=performance.now();
+ const cond=await ort.InferenceSession.create('./cond.onnx',{executionProviders:['wasm']});
+ log('conditioning-loaded',{ms:performance.now()-start,inputs:cond.inputNames,outputs:cond.outputNames});
+ start=performance.now();
+ const c=await cond.run({input_ids:new ort.Tensor('int64',BigInt64Array.from(inputs.ids,BigInt),[1,64]),attention_mask:new ort.Tensor('int64',BigInt64Array.from(inputs.mask,BigInt),[1,64]),seconds_total:new ort.Tensor('float32',Float32Array.of(2),[1])});
+ log('conditioned',{ms:performance.now()-start,shapes:Object.fromEntries(Object.entries(c).map(([k,v])=>[k,v.dims]))});
+ await cond.release();
+ log('dit-load');start=performance.now();
+ const dit=await ort.InferenceSession.create('./dit.onnx?complete=8e9c8b14',{executionProviders:['webgpu']});
+ log('dit-loaded',{ms:performance.now()-start,inputs:dit.inputNames,outputs:dit.outputNames});
+ const n=64*256;let x=new Float32Array(n);let seed=1234;function random(){seed^=seed<<13;seed^=seed>>>17;seed^=seed<<5;return ((seed>>>0)+1)/4294967297}function noise(){return Math.sqrt(-2*Math.log(random()))*Math.cos(2*Math.PI*random())}for(let j=0;j<n;j++)x[j]=noise();
+ const schedule=Array.from({length:9},(_,i)=>i===0?1:i===8?0:1/(1+Math.exp(-(8.2*(1-i/8)-2))));
+ for(let i=0;i<8;i++){
+  start=performance.now();const r=await dit.run({x:new ort.Tensor('float32',x,[1,64,256]),t:new ort.Tensor('float32',Float32Array.of(schedule[i]),[1]),cross:c.cross,global:c.global});const v=r.v.data;
+  for(let j=0;j<n;j++)x[j]=(1-schedule[i+1])*(x[j]-schedule[i]*v[j])+schedule[i+1]*noise();
+  log('step',{i,ms:performance.now()-start,finite:x.every(Number.isFinite)});
+ }
+ await dit.release();log('decoder-load');start=performance.now();
+ const dec=await ort.InferenceSession.create('./dec.onnx',{executionProviders:['webgpu']});
+ log('decoder-loaded',{ms:performance.now()-start});
+ // Decode 44 latent frames (about two seconds) from all 64 channels.
+ const count=44,z=new Float32Array(64*count);for(let ch=0;ch<64;ch++)z.set(x.subarray(ch*256,ch*256+count),ch*count);
+ start=performance.now();const r=await dec.run({z:new ort.Tensor('float32',z,[1,64,count])});const audio=r.audio;
+ log('decoded',{ms:performance.now()-start,shape:audio.dims,finite:audio.data.every(Number.isFinite)});
+ const frames=audio.dims[2],data=audio.data;let peak=0,sum=0;for(const v of data){peak=Math.max(peak,Math.abs(v));sum+=v*v}
+ const wav=new ArrayBuffer(44+frames*4),view=new DataView(wav);const str=(p,s)=>{for(let i=0;i<s.length;i++)view.setUint8(p+i,s.charCodeAt(i))};str(0,'RIFF');view.setUint32(4,wav.byteLength-8,true);str(8,'WAVEfmt ');view.setUint32(16,16,true);view.setUint16(20,1,true);view.setUint16(22,2,true);view.setUint32(24,44100,true);view.setUint32(28,176400,true);view.setUint16(32,4,true);view.setUint16(34,16,true);str(36,'data');view.setUint32(40,frames*4,true);for(let i=0;i<frames;i++)for(let ch=0;ch<2;ch++)view.setInt16(44+i*4+ch*2,Math.max(-1,Math.min(1,data[ch*frames+i]/Math.max(peak,1e-6)*0.9))*32767,true);
+ await fetch('/result.wav',{method:'PUT',body:wav});window.result={ok:true,prompt:inputs.prompt,peak,rms:Math.sqrt(sum/data.length),frames,logs:window.logs};await dec.release();log('complete',{peak,rms:window.result.rms,frames});
+}catch(e){window.result={ok:false,error:String(e),stack:e.stack,logs:window.logs};log('failed',{error:String(e)});}
+};
+log('ready');
+</script>
+
+
+
