@@ -1,0 +1,44 @@
+# dependencies
+/node_modules
+/.pnpm-store
+/.pnp
+.pnp.*
+
+/dist/
+
+# local environment files
+.env*
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# TypeScript
+*.tsbuildinfo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# local tooling
+/.sites-runtime/
+/.sites-checkout/
+/.vscode/
+/.idea/
+*.log
+
+# Locally installed model weights and runtimes
+/public/describe-synth/models/
+/public/describe-synth/runtime/
+/public/validation/
+/.rollback-assets/
+/.rollback-probe/
+/.validation-consumer/
+/*.tgz
+/.venv-local/
+/.native-temp/
+/.local-models/
+/benchmark-results/
+__pycache__/

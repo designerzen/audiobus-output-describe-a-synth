@@ -1,0 +1,64 @@
+{
+  "name": "audiobus-output-describe-synth",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && pnpm build:plugin",
+    "postbuild": "node scripts/copy-hosting-config.mjs",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "predev": "node scripts/stage-runtime.mjs",
+    "prebuild": "node scripts/stage-runtime.mjs",
+    "setup:models": "node scripts/setup-models.mjs --directory public/describe-synth/models",
+    "test": "vitest run",
+    "build:plugin": "node scripts/stage-runtime.mjs && vite build --config vite.output.config.ts && tsc -p tsconfig.package.json",
+    "check:compat": "node scripts/check-compatibility.mjs",
+    "prepack": "pnpm build:plugin"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.4",
+    "happy-dom": "20.14.5",
+    "typescript": "^5.9.3",
+    "vite": "^8.1.5",
+    "vitest": "4.1.0",
+    "onnxruntime-web": "1.24.3",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4"
+  },
+  "packageManager": "pnpm@11.9.0",
+  "description": "Independent local WebGPU voice-described instrument Output plugin",
+  "main": "./dist/plugin/index.js",
+  "types": "./dist/plugin/index.d.ts",
+  "files": [
+    "dist/plugin",
+    "scripts/install-assets.mjs",
+    "scripts/setup-models.mjs",
+    "scripts/benchmark.mjs",
+    "companion/server.py",
+    "companion/requirements.txt",
+    "companion/README.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/plugin/index.d.ts",
+      "import": "./dist/plugin/index.js"
+    },
+    "./output": {
+      "types": "./dist/plugin/output/output-describe-synth.d.ts",
+      "import": "./dist/plugin/output.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "describe-synth-assets": "./scripts/install-assets.mjs",
+    "describe-synth-models": "./scripts/setup-models.mjs",
+    "describe-synth-benchmark": "./scripts/benchmark.mjs"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}
