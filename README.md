@@ -24,6 +24,8 @@ Open the localhost URL printed by Vite, normally **http://127.0.0.1:5173/**. Use
 
 The GUI offers 1–4 variations (default 3), natural-ending or sustained playback, and a sound-identity/pitch-emphasis slider. Details show the transcript, actual generation prompt, model, seed and matching score. Preview-original plays the retained generator audio at its original speed; preview-playable uses the chosen MIDI note and current resonance/loop settings, releasing after four seconds. Both previews are level-normalized for comparison.
 
+The interface follows **Describe → Shape → Play**. Generation settings and sound diagnostics are disclosed when needed; the empty state explains the next action, and the demo keyboard becomes available once an instrument is ready. Focus indicators, held-note feedback, responsive controls and reduced-motion support are included.
+
 Typed descriptions use the same generation/preparation path. The test page saves its active patch in browser local storage; exported files are the portable backup. The native Output saves the patch in the host's workspace options.
 
 `setup:models` installs approximately 2.4 GB of local assets, including the sound model, Moonshine speech recognition and quantized CLAP text/audio models. Downloads are setup only, not hosted inference. The sound graphs, sound tokenizer and CLAP graphs are checked against pinned SHA-256 hashes; interrupted downloads can be resumed. On this development machine the verified sound-model downloads from the earlier investigation are reused automatically.
@@ -45,7 +47,7 @@ This is the configured URL, not a claim that deployment has already run. Custom 
 The Pages artifact is about 105 MB and excludes all model weights. GitHub Pages has a [1 GB published-site limit](https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits); the 2.3 GB of models are installed on the visitor's device instead. On the hosted page:
 
 1. Choose **Download models to this device** to fetch pinned pretrained files from Hugging Face into this site's browser cache. Downloads stream to cache, resume by skipping completed files, and do not run hosted inference. Browser setup validates expected file sizes; the Node setup CLI also checks the pinned graph hashes.
-2. Alternatively, run `pnpm setup:models` locally and use **Import your existing models folder** to select `public/describe-synth/models`. The folder must contain `sound`, `moonshine`, and `clap`. This avoids downloading those weights again over the internet.
+2. Alternatively, run `pnpm setup:models` locally and use **Import existing model folder** to select `public/describe-synth/models`. The folder must contain `sound`, `moonshine`, and `clap`. This avoids downloading those weights again over the internet.
 3. Once **Models ready** appears, hold the microphone button or type a description and generate. The browser may ask for microphone permission. Use a desktop WebGPU browser with at least about 2.5 GB of available browser storage plus inference working memory.
 
 The page keeps recordings and inference on-device. Model caches belong to the site's origin and URL path; a localhost cache does not automatically carry over to the GitHub Pages origin. Clearing browser data or cache eviction requires setup again. The optional native CUDA companion is intended for the localhost app; the hosted page does not supply a native server.

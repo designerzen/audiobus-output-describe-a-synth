@@ -2,6 +2,7 @@ import { recordedBlobToMonoPcm } from "../lib/audio.js";
 import { HoldRecorder } from "./hold-recorder.js";
 import { LocalPipeline } from "./pipeline-client.js";
 import { restorePatch, savePatch } from "./patch-storage.js";
+import { GUI_STYLES } from "./gui-styles.js";
 // @ts-expect-error Native worker DSP is also bundled into the Output for instant pitch-emphasis changes.
 import { applyPitchEmphasis } from "../../public/describe-synth/patch.js";
 // @ts-expect-error Native shared local-backend URL validation.
@@ -71,6 +72,8 @@ export default class OutputDescribeSynth extends EventTarget implements IAudioOu
     alternatives: HTMLSelectElement; emphasis: HTMLInputElement; emphasisValue: HTMLOutputElement;
     details: HTMLElement; count: HTMLSelectElement; backend: HTMLSelectElement;
     companion: HTMLInputElement; playback: HTMLSelectElement; previewNote: HTMLInputElement;
+    holdLabel: HTMLElement; holdHint: HTMLElement; badge: HTMLElement; settingsSummary: HTMLElement;
+    empty: HTMLElement; instrument: HTMLElement; patchMeta: HTMLElement;
   };
   state: PipelineUpdate = { stage: "idle", message: "Hold the microphone button and describe an instrument or sound." };
 
@@ -191,7 +194,7 @@ export default class OutputDescribeSynth extends EventTarget implements IAudioOu
     select.replaceChildren();
     this.candidates.forEach((candidate, index) => {
       const option = document.createElement("option"); option.value = String(index);
-      option.textContent = `Alternative ${index + 1}${candidate.similarity === undefined ? " · unranked" : ` · match ${candidate.similarity.toFixed(3)}`}`;
+      option.textContent = `Variation ${index + 1}${index === 0 && candidate.similarity !== undefined ? " · suggested" : ""}`;
       option.selected = candidate.seed === this.patch?.seed;
       select.append(option);
     });
@@ -217,6 +220,7 @@ export default class OutputDescribeSynth extends EventTarget implements IAudioOu
       } catch { source.disconnect(); gain?.disconnect(); }
     }
     this.previewSource = undefined; this.previewGain = undefined;
+    this.render();
   }
 
   async preview(kind: "original" | "playable", note = 60): Promise<void> {
@@ -246,8 +250,9 @@ export default class OutputDescribeSynth extends EventTarget implements IAudioOu
       source.connect(gain); gain.connect(this.output);
     } else source.connect(this.output);
     this.previewSource = source; this.previewGain = gain;
-    source.addEventListener("ended", () => { source.disconnect(); gain?.disconnect(); if (this.previewSource === source) { this.previewSource = undefined; this.previewGain = undefined; } }, { once: true });
+    source.addEventListener("ended", () => { source.disconnect(); gain?.disconnect(); if (this.previewSource === source) { this.previewSource = undefined; this.previewGain = undefined; this.render(); } }, { once: true });
     source.start();
+    this.render();
     this.previewTimer = setTimeout(() => { if (this.previewSource === source) this.stopPreview(); }, kind === "playable" ? (4 + patch.spec.release) * 1000 : 4000);
   }
 
@@ -359,37 +364,54 @@ export default class OutputDescribeSynth extends EventTarget implements IAudioOu
     const panel = document.createElement("section");
     panel.className = "describe-synth-panel nodrag nopan nowheel";
     panel.setAttribute("aria-label", "Describe a Synth");
-    panel.innerHTML = `<style>
-      .describe-synth-panel{display:grid;gap:12px;min-width:240px;max-width:440px;padding:16px;box-sizing:border-box;font:14px/1.5 system-ui;color:inherit}
-      .describe-synth-panel button,.describe-synth-panel textarea{font:inherit;border:1px solid #71838d;border-radius:8px;padding:10px;color:inherit;background:transparent}
-      .describe-synth-panel textarea{resize:vertical;min-height:66px;width:100%;box-sizing:border-box}
-      .describe-synth-panel .synth-hold{min-height:72px;background:#156d65;color:white;font-weight:650;touch-action:none;user-select:none}
-      .describe-synth-panel .synth-hold[aria-pressed=true]{background:#9c3030}
-      .describe-synth-panel :focus-visible{outline:3px solid #ebaf51;outline-offset:3px}
-      .describe-synth-panel button:disabled{opacity:.45;cursor:not-allowed}
-      .describe-synth-panel p{margin:0}.describe-synth-panel progress{width:100%}
-      .describe-synth-panel .synth-actions{display:flex;gap:8px;flex-wrap:wrap}
-      .describe-synth-panel label{display:grid;gap:6px}.describe-synth-panel small{opacity:.75}
-    </style>
-    <strong>Describe a Synth</strong>
-    <button type="button" class="synth-hold" aria-pressed="false">Hold to describe a sound</button>
-    <small>Keep holding while you speak. Transcription starts as you talk. Release to finish and create your instrument. Space or Enter also works.</small>
-    <p role="status" aria-live="polite" data-status></p><progress max="1" hidden></progress>
-    <form><label>Description<textarea maxlength="1500" placeholder="A warm cello, a glass bell, ocean waves…"></textarea></label><button type="submit">Create from text</button></form>
-    <label>Generator<select data-backend><option value="browser">Local browser GPU</option><option value="companion">Local CUDA companion · AudioLDM2</option></select></label>
-    <label data-companion-label hidden>Companion address<input data-companion type="url" value="http://127.0.0.1:8794/"><small>Experimental AudioLDM2 checkpoint · noncommercial CC-BY-NC-SA-4.0 license.</small></label>
-    <label>Variations<select data-count><option value="1">1 · fastest, manual audition</option><option value="2">2 · local matching</option><option value="3">3 · local matching</option><option value="4">4 · local matching</option></select></label>
-    <p data-patch>No instrument prepared yet.</p>
-    <label>Choose a sound<select data-alternatives aria-label="Sound alternatives"></select></label>
-    <label>Playback<select data-playback><option value="natural">Natural ending · single event</option><option value="sustain">Sustain while held · loop body</option></select></label>
-    <label>Sound identity ↔ stronger musical pitch<input data-emphasis type="range" min="0" max="1" step="0.05" value="0"><output data-emphasis-value>Preserve source</output></label>
-    <small>Pitch emphasis adds resonance from the source. Unpitched sounds use middle C as a relative transposition reference; they may have no exact musical fundamental.</small>
-    <label>Playable preview MIDI note<input data-preview-note type="number" min="0" max="127" value="60"></label>
-    <div class="synth-actions"><button type="button" data-original>Preview original</button><button type="button" data-playable>Preview playable</button><button type="button" data-stop>Stop preview</button></div>
-    <details><summary>Transcript, prompt and matching</summary><p data-details style="white-space:pre-wrap;overflow-wrap:anywhere"></p></details>
-    <div class="synth-actions"><button type="button" data-cancel>Cancel</button><button type="button" data-export>Export instrument</button></div>
-    <label>Import instrument<input type="file" accept="application/json,.json"></label>
-    <small>Speech recognition and sound generation run on this device. Local model files must be installed.</small>`;
+    panel.innerHTML = `<style>${GUI_STYLES}</style>
+    <div class="synth-topline"><span class="synth-eyebrow">Sound workspace</span><span class="synth-badge" data-badge>Ready to describe</span></div>
+    <section class="synth-section" aria-label="Describe your sound">
+      <div class="synth-section-title"><span class="synth-step" aria-hidden="true">01</span><h2>Describe your sound</h2></div>
+      <div class="synth-create-grid">
+        <div class="synth-voice">
+          <button type="button" class="synth-hold" aria-pressed="false" aria-label="Hold to describe a sound" aria-describedby="${this.uuid}-hold-help">
+            <span class="synth-mic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M6 11v1a6 6 0 0 0 12 0v-1M12 18v3M9 21h6"/></svg></span>
+            <span><strong data-hold-label>Hold to describe a sound</strong><small data-hold-hint>Release to create your instrument</small></span>
+            <span class="synth-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+          </button>
+          <small id="${this.uuid}-hold-help">Keep holding while you speak. Transcription starts as you talk. You can also hold Space or Enter.</small>
+        </div>
+        <form class="synth-form">
+          <label><span>Or type your description</span><textarea maxlength="1500" placeholder="A warm cello with a soft attack, or a deep creature roar…" aria-describedby="${this.uuid}-text-help"></textarea></label>
+          <div class="synth-form-footer"><small id="${this.uuid}-text-help">Any instrument. Any imagined sound.</small><button class="synth-generate" type="submit">Create from text <span aria-hidden="true">↗</span></button></div>
+        </form>
+      </div>
+      <div class="synth-status-wrap"><div class="synth-status-row"><p role="status" aria-live="polite" data-status></p><button type="button" class="synth-cancel" data-cancel hidden>Cancel</button></div><progress max="1" aria-label="Sound preparation progress" hidden></progress></div>
+      <details class="synth-settings"><summary>Generation settings <span class="synth-settings-hint" data-settings-summary></span></summary>
+        <div class="synth-settings-body"><div class="synth-field-grid">
+          <label>Variations<select data-count><option value="1">1 · quickest</option><option value="2">2 · compare sounds</option><option value="3">3 · compare sounds</option><option value="4">4 · compare sounds</option></select></label>
+          <label>Generator<select data-backend><option value="browser">On-device browser GPU</option><option value="companion">Local CUDA companion · AudioLDM2</option></select></label>
+        </div><label data-companion-label hidden>Companion address<input data-companion type="url" value="http://127.0.0.1:8794/"><small>Experimental AudioLDM2 checkpoint · noncommercial CC-BY-NC-SA-4.0 license.</small></label>
+        <small>More variations take longer. They are matched to your description on this device.</small></div>
+      </details>
+    </section>
+    <section class="synth-section synth-shape" aria-label="Shape your instrument">
+      <div class="synth-section-title"><span class="synth-step" aria-hidden="true">02</span><h2>Shape your instrument</h2></div>
+      <div class="synth-empty" data-empty>
+        <svg viewBox="0 0 64 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 14h8m5-5v10m8-16v22m8-18v14m8-10v6m8-14v22m8-16v10m5-5h2"/></svg>
+        <strong>Your next sound starts with an idea</strong><p>Describe it above, or import an instrument below. Then audition and shape it here.</p>
+      </div>
+      <div class="synth-instrument" data-instrument hidden>
+        <div><p class="synth-patch-name" data-patch></p><p class="synth-patch-meta" data-patch-meta></p></div>
+        <div class="synth-field-grid"><label>Sound variation<select data-alternatives aria-label="Sound alternatives"></select></label>
+          <label>When you hold a note<select data-playback><option value="natural">Play once · natural ending</option><option value="sustain">Sustain · loop the sound</option></select></label></div>
+        <label class="synth-range-label"><span class="synth-field-title"><span>Pitch emphasis</span><output data-emphasis-value>Preserve source</output></span><input data-emphasis type="range" min="0" max="1" step="0.05" value="0" aria-describedby="${this.uuid}-pitch-help"></label>
+        <div class="synth-range-ends" aria-hidden="true"><span>Original texture</span><span>More tonal</span></div>
+        <small id="${this.uuid}-pitch-help">Keep the sound's character, or add more pitched resonance.</small>
+        <div class="synth-actions"><button type="button" class="synth-primary" data-playable>Preview playable</button><button type="button" data-original>Preview original</button><button type="button" data-stop disabled>Stop preview</button></div>
+        <details><summary>Sound details &amp; tuning</summary><div class="synth-details-body">
+          <label class="synth-preview-note">Preview MIDI note<input data-preview-note type="number" min="0" max="127" value="60"></label>
+          <small>Unpitched sounds use middle C as their transposition reference. Higher notes can change their speed and character.</small><p data-details></p>
+        </div></details>
+      </div>
+    </section>
+    <div class="synth-library"><label class="synth-import">Import instrument<input class="synth-file" type="file" accept="application/json,.json"></label><button type="button" data-export>Export instrument</button><span class="synth-privacy">Your voice and sound stay on this device.</span></div>`;
     const hold = panel.querySelector<HTMLButtonElement>(".synth-hold")!;
     const prompt = panel.querySelector("textarea")!;
     this.controls = {
@@ -400,6 +422,8 @@ export default class OutputDescribeSynth extends EventTarget implements IAudioOu
       alternatives: panel.querySelector("[data-alternatives]")!, emphasis: panel.querySelector("[data-emphasis]")!, emphasisValue: panel.querySelector("[data-emphasis-value]")!,
       details: panel.querySelector("[data-details]")!, count: panel.querySelector("[data-count]")!, backend: panel.querySelector("[data-backend]")!,
       companion: panel.querySelector("[data-companion]")!, playback: panel.querySelector("[data-playback]")!, previewNote: panel.querySelector("[data-preview-note]")!,
+      holdLabel: panel.querySelector("[data-hold-label]")!, holdHint: panel.querySelector("[data-hold-hint]")!, badge: panel.querySelector("[data-badge]")!,
+      settingsSummary: panel.querySelector("[data-settings-summary]")!, empty: panel.querySelector("[data-empty]")!, instrument: panel.querySelector("[data-instrument]")!, patchMeta: panel.querySelector("[data-patch-meta]")!,
     };
     this.controls.count.value = String(this.candidateCount);
     this.controls.backend.value = this.useCompanion ? "companion" : "browser";
@@ -412,6 +436,7 @@ export default class OutputDescribeSynth extends EventTarget implements IAudioOu
     const press = () => {
       if (this.busy || ["recording", "requesting-microphone"].includes(this.state.stage) || !this.connected || this.destroyed) return;
       void this.context.resume().catch(error => this.fail(error));
+      this.stopPreview();
       this.speech?.cancel();
       this.speech = this.pipeline.startSpeech?.(text => {
         if (this.controls) this.controls.prompt.value = text;
@@ -442,14 +467,16 @@ export default class OutputDescribeSynth extends EventTarget implements IAudioOu
     listen(window, EVENTS.blur, () => { if (key !== undefined || pointer !== undefined) release(); });
     listen(document, EVENTS.visibility, () => { if (document.hidden && (key !== undefined || pointer !== undefined)) release(); });
     listen(panel.querySelector("form")!, EVENTS.submit, event => { event.preventDefault(); void this.describe(prompt.value).catch(error => this.fail(error)); });
+    listen(prompt, "input", () => this.render());
     listen(this.controls.cancel, EVENTS.click, () => this.cancelPreparation());
     listen(this.controls.original, EVENTS.click, () => { void this.preview("original").catch(error => this.fail(error)); });
     listen(this.controls.playable, EVENTS.click, () => { void this.preview("playable", Number(this.controls!.previewNote.value)).catch(error => this.fail(error)); });
     listen(this.controls.stop, EVENTS.click, () => this.stopPreview());
-    listen(this.controls.count, EVENTS.change, () => { this.candidateCount = Number(this.controls!.count.value); });
+    listen(this.controls.count, EVENTS.change, () => { this.candidateCount = Number(this.controls!.count.value); this.render(); });
     listen(this.controls.backend, EVENTS.change, () => {
       this.useCompanion = this.controls!.backend.value === "companion";
       panel.querySelector<HTMLElement>("[data-companion-label]")!.hidden = !this.useCompanion;
+      this.render();
     });
     listen(this.controls.companion, EVENTS.change, () => {
       try { loopbackEndpoint(this.controls!.companion.value); this.companionUrl = this.controls!.companion.value; }
@@ -460,6 +487,7 @@ export default class OutputDescribeSynth extends EventTarget implements IAudioOu
       if (candidate) this.installPatch({ ...candidate, pitchEmphasis: this.patch?.pitchEmphasis ?? 0 });
     });
     listen(this.controls.emphasis, EVENTS.change, () => this.setPitchEmphasis(Number(this.controls!.emphasis.value)));
+    listen(this.controls.emphasis, "input", () => { this.controls!.emphasisValue.textContent = Number(this.controls!.emphasis.value) ? `${Math.round(Number(this.controls!.emphasis.value) * 100)}% resonance` : "Preserve source"; });
     listen(this.controls.playback, EVENTS.change, () => {
       if (this.patch) this.installPatch({ ...this.patch, spec: { ...this.patch.spec, oneShot: this.controls!.playback.value === "natural" } });
     });
@@ -492,26 +520,38 @@ export default class OutputDescribeSynth extends EventTarget implements IAudioOu
     if (!this.controls) return;
     const c = this.controls;
     const recording = ["recording", "requesting-microphone"].includes(this.state.stage);
+    if (this.gui) this.gui.dataset.stage = this.state.stage;
+    const labels: Record<string, string> = { idle: "Ready to describe", recording: "Listening", "requesting-microphone": "Microphone access", transcribing: "Transcribing", interpreting: "Understanding", generating: "Creating sound", matching: "Matching sounds", preparing: "Preparing instrument", ready: "Instrument ready", error: "Needs attention" };
+    c.badge.textContent = !this.connected ? "Disconnected" : labels[this.state.stage] ?? "Preparing instrument";
     c.hold.disabled = this.busy || !this.connected || this.destroyed;
     c.hold.setAttribute("aria-pressed", String(recording));
-    c.hold.textContent = recording ? "Listening… release to finish" : "Hold to describe a sound";
+    const awaitingMicrophone = this.state.stage === "requesting-microphone";
+    c.holdLabel.textContent = awaitingMicrophone ? "Keep holding…" : recording ? "Listening… release to finish" : "Hold to describe a sound";
+    c.holdHint.textContent = awaitingMicrophone ? "Allow microphone access to begin" : recording ? "Keep holding while you speak" : "Release to create your instrument";
+    c.hold.setAttribute("aria-label", c.holdLabel.textContent);
     c.status.textContent = this.state.message;
     c.progress.hidden = !this.busy;
     if (this.state.progress === undefined) c.progress.removeAttribute("value"); else c.progress.value = this.state.progress;
-    c.generate.disabled = this.busy || recording || !this.connected;
+    c.generate.disabled = this.busy || recording || !this.connected || !c.prompt.value.trim();
     c.prompt.disabled = this.busy || recording;
     c.cancel.disabled = !this.busy && !recording;
+    c.cancel.hidden = !this.busy && !recording;
     c.export.disabled = !this.patch;
     c.file.disabled = this.busy || recording;
     for (const control of [c.count, c.backend, c.companion]) control.disabled = this.busy || recording;
     for (const control of [c.alternatives, c.emphasis, c.playback]) control.disabled = !this.patch || this.busy || recording;
-    c.original.disabled = !this.patch || !this.connected;
-    c.playable.disabled = !this.patch || !this.connected;
+    c.original.disabled = !this.patch || !this.connected || recording;
+    c.playable.disabled = !this.patch || !this.connected || recording;
+    c.stop.disabled = !this.previewSource;
+    c.empty.hidden = !!this.patch;
+    c.instrument.hidden = !this.patch;
+    c.settingsSummary.textContent = `${this.candidateCount} ${this.candidateCount === 1 ? "variation" : "variations"} · ${this.useCompanion ? "CUDA companion" : "Browser GPU"}`;
     c.emphasis.value = String(this.patch?.pitchEmphasis ?? 0);
-    c.emphasisValue.textContent = this.patch?.pitchEmphasis ? `${Math.round(this.patch.pitchEmphasis * 100)}% pitch resonance` : "Preserve source";
+    c.emphasisValue.textContent = this.patch?.pitchEmphasis ? `${Math.round(this.patch.pitchEmphasis * 100)}% resonance` : "Preserve source";
     c.playback.value = this.patch?.spec.oneShot ? "natural" : "sustain";
     c.details.textContent = this.patch ? `Transcript / description: ${this.patch.description}\nGeneration prompt: ${this.patch.spec.prompt}\nModel: ${this.patch.model}\nSeed: ${this.patch.seed}\n${this.patch.similarity === undefined ? "Unranked; audition to choose." : `CLAP cosine similarity: ${this.patch.similarity.toFixed(3)}. Relative match, not a probability or guarantee.`}\n${this.patch.originalPcm ? "Original generator audio retained." : "Legacy patch: original generator audio was not saved."}` : "Your description, generation prompt and matching results will appear here.";
-    c.patch.textContent = this.patch ? `${this.patch.description} · ${this.patch.mode === "sample" ? "Tuned sample" : this.patch.mode === "source-texture" ? "Preserved source texture · relative tuning" : "Legacy pitched texture"} · reference ${this.patch.rootFrequency.toFixed(1)} Hz` : "No instrument prepared yet. Notes are ignored until a patch is ready.";
+    c.patch.textContent = this.patch?.description ?? "";
+    c.patchMeta.textContent = this.patch ? `${this.patch.spec.oneShot ? "Natural ending" : "Sustained playback"} · ${this.patch.mode === "sample" ? "Tuned sample" : this.patch.mode === "source-texture" ? "Source texture preserved" : "Legacy pitched texture"}` : "";
   }
 
   async destroyGui(): Promise<void> {
